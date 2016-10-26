@@ -14,20 +14,10 @@ RUN apt-get update -qq && apt-get -y install \
     git \
     --no-install-recommends
 
-WORKDIR /src
+WORKDIR /build
 
 # Import resources
-COPY ./resources /src/resources
+COPY ./resources /build/resources
 COPY ./Makefile /build
 
-# production mode
-#
-
-# invoke the docker command as:
-#     docker run -i -t -v $PWD:/release --rm jdk8:v1 bash  
-
-# Development Mode
-#
-# don't invoke: "COPY ./Makefile /build" in the Dockerfile,
-# rather run:
-#     docker run -i -t -v $PWD:/build --rm jdk8:v1 bash
+CMD make

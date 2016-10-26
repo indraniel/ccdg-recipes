@@ -14,14 +14,13 @@ TEST  := /usr/bin/test
 # basic workspace directories
 WORK_DIR         := /build
 BASE_INSTALL_DIR := $(WORK_DIR)
-SRC_DIR          := /src
-RESOURCES_DIR    := $(SRC_DIR)/resources
+RESOURCES_DIR    := $(WORK_DIR)/resources
 RELEASE_DIR      := /release
 
 # source code information
 JDK8_VERSION    := 8u111
 JDK8_TGZ        := $(RESOURCES_DIR)/jdk-8u111-linux-x64.tar.gz
-JDK8_OUTPUT_DIR := $(SRC_DIR)/jdk1.8.0_111
+JDK8_OUTPUT_DIR := $(WORK_DIR)/jdk1.8.0_111
 JAVA            := $(JDK8_OUTPUT_DIR)/bin/java
 
 # debian packaging related variables
@@ -83,7 +82,7 @@ debian: | $(JAVA)
 		$(MV) $(DEB_PKG) $(RELEASE_DIR)
 
 $(JAVA): $(JDK8_TGZ)
-	$(TAR) -C $(SRC_DIR) -zxvf $(JDK8_TGZ)
+	$(TAR) -C $(WORK_DIR) -zxvf $(JDK8_TGZ)
 
 debclean:
 	if [ -e $(DEB_BUILD_DIR) ]; then $(RM) -rf $(DEB_BUILD_DIR); fi
