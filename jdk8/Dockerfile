@@ -9,7 +9,7 @@ VOLUME /release
 RUN apt-get update -qq && apt-get -y install \
     build-essential \
     debhelper \
-	libcurl4-openssl-dev \
+    libcurl4-openssl-dev \
     ca-certificates \
     curl \
     --no-install-recommends

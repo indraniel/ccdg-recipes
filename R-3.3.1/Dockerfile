@@ -8,16 +8,16 @@ VOLUME /release
 # bootstrap build dependencies
 RUN apt-get update -qq && \
     apt-get -y install apt-transport-https && \
-	echo "deb [trusted=yes] https://bitbucket.org/idas/ccdg-apt-repo/raw/master ccdg main" | tee -a /etc/apt/sources.list && \
-	apt-get update -qq && \
-	apt-get -y install \
+    echo "deb [trusted=yes] https://bitbucket.org/idas/ccdg-apt-repo/raw/master ccdg main" | tee -a /etc/apt/sources.list && \
+    apt-get update -qq && \
+    apt-get -y install \
     build-essential \
     debhelper \
     automake \
     autotools-dev \
     git \
-	curl \
-	ccdg-openblas-0.2.19 \
+    curl \
+    ccdg-openblas-0.2.19 \
     --no-install-recommends
 
 WORKDIR /build

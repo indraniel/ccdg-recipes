@@ -12,7 +12,7 @@ RUN apt-get update -qq && apt-get -y install \
     automake \
     autotools-dev \
     git \
-	curl \
+    curl \
     --no-install-recommends
 
 WORKDIR /build
