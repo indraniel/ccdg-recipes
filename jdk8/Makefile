@@ -1,6 +1,7 @@
 .PHONY: clean debian debclean
 
 # external commands used
+CURL  := /usr/bin/curl
 TAR   := /bin/tar
 CP    := /bin/cp
 RM    := /bin/rm
@@ -19,6 +20,7 @@ RELEASE_DIR      := /release
 
 # source code information
 JDK8_VERSION    := 8u111
+JAVA_URL        := http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.tar.gz
 JDK8_TGZ        := $(RESOURCES_DIR)/jdk-8u111-linux-x64.tar.gz
 JDK8_OUTPUT_DIR := $(WORK_DIR)/jdk1.8.0_111
 JAVA            := $(JDK8_OUTPUT_DIR)/bin/java
@@ -83,6 +85,12 @@ debian: | $(JAVA)
 
 $(JAVA): $(JDK8_TGZ)
 	$(TAR) -C $(WORK_DIR) -zxvf $(JDK8_TGZ)
+
+$(JDK8_TGZ):
+	mkdir -p $(RESOURCES_DIR)
+	cd $(RESOURCES_DIR) && \
+		$(CURL) --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+		-L -O $(JAVA_URL)
 
 debclean:
 	if [ -e $(DEB_BUILD_DIR) ]; then $(RM) -rf $(DEB_BUILD_DIR); fi

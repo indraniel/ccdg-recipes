@@ -9,15 +9,14 @@ VOLUME /release
 RUN apt-get update -qq && apt-get -y install \
     build-essential \
     debhelper \
-    automake \
-    autotools-dev \
-    git \
+	libcurl4-openssl-dev \
+    ca-certificates \
+    curl \
     --no-install-recommends
 
 WORKDIR /build
 
 # Import resources
-COPY ./resources /build/resources
 COPY ./Makefile /build
 
 CMD make
