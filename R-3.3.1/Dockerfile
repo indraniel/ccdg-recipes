@@ -27,15 +27,3 @@ WORKDIR /build
 COPY ./Makefile /build
 
 CMD make
-
-# production mode
-#
-
-# invoke the docker command as:
-#     docker run -i -t -v $PWD:/release --rm jdk8:v1 bash  
-
-# Development Mode
-#
-# don't invoke: "COPY ./Makefile /build" in the Dockerfile,
-# rather run:
-#     docker run -i -t -v $PWD:/build --rm jdk8:v1 bash
