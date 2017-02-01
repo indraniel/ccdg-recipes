@@ -20,13 +20,14 @@ ROOT_EXE           := $(BASE_INSTALL_DIR)/bin/root.exe
 CNVNATOR_EXE       := $(BASE_INSTALL_DIR)/bin/cnvnator-$(CNVNATOR_VERSION)
 #SAMTOOLS_LIB       := $(CNVNATOR_SRC_DIR)/samtools/libbam.a
 
-DEB_BUILD_DIR       := $(BASE_DIR)/deb-build
-UBUNTU_EDITION      := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
-DEB_RELEASE_VERSION := 1ubuntu$(UBUNTU_EDITION)
-DEB_PKG             := cnvnator_$(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
-DEB_PKG_PATH        := $(BASE_DIR)/$(DEB_PKG)
-DEB_BASE_INSTALL    := /opt/cnvnator-$(CNVNATOR_VERSION)
-DEB_RELEASE_DIR     := /release
+DEB_BUILD_DIR        := $(BASE_DIR)/deb-build
+UBUNTU_EDITION       := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
+DEB_CNVNATOR_VERSION := 0.3
+DEB_RELEASE_VERSION  := 1ubuntu$(UBUNTU_EDITION)
+DEB_PKG              := cnvnator-$(CNVNATOR_VERSION)_$(DEB_CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEB_PKG_PATH         := $(BASE_DIR)/$(DEB_PKG)
+DEB_BASE_INSTALL     := /opt/cnvnator-$(CNVNATOR_VERSION)
+DEB_RELEASE_DIR      := /release
 
 all: debian
 
