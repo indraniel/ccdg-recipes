@@ -31,6 +31,6 @@ WORKDIR /build
 ENV PATH=/opt/ccdg/python-2.7.12/bin:${PATH}
 
 # Import resources
-#COPY ./Makefile /build
+COPY ./Makefile /build
 
 CMD make && make debian
