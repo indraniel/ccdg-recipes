@@ -113,7 +113,7 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: build-essential, libc6, zlib1g, libstdc++6, libgcc1, libxpm4, ccdg-python-2.7.12
+Depends: libc6, zlib1g, libstdc++6, libgcc1, libxpm4, ccdg-python-2.7.12
 Description: An unofficial WUSTL MGI package of Speedseq's cnvnator-multi
 Version: $(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION)
 endef
