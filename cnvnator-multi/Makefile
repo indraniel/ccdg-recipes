@@ -24,9 +24,9 @@ DEB_BUILD_DIR        := $(BASE_DIR)/deb-build
 UBUNTU_EDITION       := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
 DEB_CNVNATOR_VERSION := 0.3
 DEB_RELEASE_VERSION  := 1ubuntu$(UBUNTU_EDITION)
-DEB_PKG              := cnvnator-$(CNVNATOR_VERSION)_$(DEB_CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEB_PKG              := ccdg-cnvnator-$(CNVNATOR_VERSION)_$(DEB_CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH         := $(BASE_DIR)/$(DEB_PKG)
-DEB_BASE_INSTALL     := /opt/cnvnator-$(CNVNATOR_VERSION)
+DEB_BASE_INSTALL     := /opt/ccdg/cnvnator-$(CNVNATOR_VERSION)
 DEB_RELEASE_DIR      := /release
 
 all: debian
@@ -109,7 +109,7 @@ export root_wrapper
 
 # DEBIAN CONTROL FILE #########################################################
 define debian_control
-Package: cnvnator-$(CNVNATOR_VERSION)
+Package: ccdg-cnvnator-$(CNVNATOR_VERSION)
 Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
@@ -145,7 +145,7 @@ export debian_preinst
 define debian_postrm
 #!/bin/bash
 
-BASE=/opt/cnvnator-$(CNVNATOR_VERSION)
+BASE=/opt/ccdg/cnvnator-$(CNVNATOR_VERSION)
 
 if [ -e $${BASE} ]; then
     rm -rfv $${BASE}
