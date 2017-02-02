@@ -116,7 +116,7 @@ Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
 Depends: libc6, zlib1g, libstdc++6, libgcc1, libxpm4, ccdg-python-2.7.12
 Description: An unofficial WUSTL MGI package of Speedseq's cnvnator-multi
-Version: $(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION)
+Version: $(DEB_CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION)
 endef
 export debian_control
 
@@ -151,8 +151,8 @@ if [ -e $${BASE} ]; then
     rm -rfv $${BASE}
 fi
 
-if [ -e /usr/local/cnvnator ]; then
-    rm -fv /usr/local/cnvnator
+if [ -e /usr/local/cnvnator-multi ]; then
+    rm -fv /usr/local/cnvnator-multi
 fi
 
 if [ -e /usr/local/root ]; then
@@ -183,8 +183,8 @@ debian: $(ROOT_EXE) $(CNVNATOR_EXE)
 	
 	# create the "wrapper" scripts for cnvnator and root
 	mkdir -p $(DEB_BUILD_DIR)/usr/local/bin
-	echo "$$cnvnator_wrapper" >$(DEB_BUILD_DIR)/usr/local/bin/cnvnator
-	chmod a+x $(DEB_BUILD_DIR)/usr/local/bin/cnvnator
+	echo "$$cnvnator_wrapper" >$(DEB_BUILD_DIR)/usr/local/bin/cnvnator-multi
+	chmod a+x $(DEB_BUILD_DIR)/usr/local/bin/cnvnator-multi
 	echo "$$root_wrapper" >$(DEB_BUILD_DIR)/usr/local/bin/root
 	chmod a+x $(DEB_BUILD_DIR)/usr/local/bin/root
 	
