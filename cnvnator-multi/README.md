@@ -19,4 +19,4 @@ comment out the "COPY" commands in the Dockerfile, and then run:
     cd /release
     # manually install the prerequisites for the package
     apt-get install libc6 zlib1g libstdc++6 libgcc1 libxpm4 ccdg-python-2.7.12
-    dpkg --install cnvnator-multi_0.3-1ubuntu14.04.deb
+    dpkg --install ccdg-cnvnator-multi_0.3-1ubuntu14.04.deb
