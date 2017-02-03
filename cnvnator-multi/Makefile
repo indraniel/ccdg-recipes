@@ -48,7 +48,7 @@ $(CNVNATOR_SRC_DIR): | $(BASE_SRC_DIR)
 
 $(ROOT_EXE): | $(ROOT_SRC_DIR) $(BASE_INSTALL_DIR)
 	cd $(ROOT_SRC_DIR) && \
-		./configure --prefix=$(BASE_INSTALL_DIR) --fail-on-missing --minimal && \
+		ROOTSYS=$(BASE_INSTALL_DIR) ./configure --prefix=$(BASE_INSTALL_DIR) --etcdir=$(BASE_INSTALL_DIR)/etc --fail-on-missing --minimal && \
 		$(MAKE) -j 2 && \
 		$(MAKE) install
 
@@ -125,7 +125,7 @@ define debian_preinst
 #!/bin/bash
 
 BASE=$(DEB_BASE_INSTALL)
-SUBDIRS=(bin include lib include share)
+SUBDIRS=(bin etc include lib include share)
 
 if [ -e $${BASE} ]; then
     ROOT=$${BASE}/srasearch
@@ -177,6 +177,7 @@ debian: $(ROOT_EXE) $(CNVNATOR_EXE)
 	
 	# install compiled materials for cnvnator & root
 	cp -rv $(BASE_INSTALL_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	cp -rv $(BASE_INSTALL_DIR)/etc $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	cp -rv $(BASE_INSTALL_DIR)/include $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	cp -rv $(BASE_INSTALL_DIR)/lib $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	cp -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
