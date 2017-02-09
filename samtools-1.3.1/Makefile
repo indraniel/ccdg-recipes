@@ -2,15 +2,12 @@
 
 # external commands used
 CURL  := /usr/bin/curl
-UNZIP := /usr/bin/unzip
-BZIP  := /bin/bzip2
 TAR   := /bin/tar
 CP    := /bin/cp
 RM    := /bin/rm
 MV    := /bin/mv
 MKDIR := /bin/mkdir
 ECHO  := /bin/echo
-CHMOD := /bin/chmod
 AR    := /usr/bin/ar
 TEST  := /usr/bin/test
 
@@ -50,31 +47,11 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
+Depends: libc6, libcurl3, zlib1g, ca-certificates, libncurses5
 Description: samtools-$(SAMTOOLS_VERSION) plus htslib-$(HTSLIB_VERSION) for the CCDG pipeline
 Version: $(SAMTOOLS_VERSION)-$(DEB_RELEASE_VERSION)
 endef
 export debian_control
-
-# DEBIAN PREINST FILE #########################################################
-define debian_preinst
-#!/bin/bash
-
-BASE=$(DEB_BASE_INSTALL)
-SUBDIRS=(bin include lib include share)
-
-if [ -e $${BASE} ]; then
-    ROOT=$${BASE}/srasearch
-    for subdir in $${SUBDIRS[*]}; do
-        DIR=$${ROOT}/$${subdir}
-        if [ ! -e $${DIR} ]; then
-            mkdir -p $${DIR}
-            chmod 0775 $${DIR}
-        fi
-    done
-fi
-
-endef
-export debian_preinst
 
 # DEBIAN POSTRM FILE ###########################################################
 define debian_postrm
@@ -102,10 +79,10 @@ debian: | $(SAMTOOLS)
 	# create the "installed" file directory structure
 	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 
-	cp -rv $(BASE_INSTALL_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	cp -rv $(BASE_INSTALL_DIR)/include $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	cp -rv $(BASE_INSTALL_DIR)/lib $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	cp -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(CP) -rv $(BASE_INSTALL_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(CP) -rv $(BASE_INSTALL_DIR)/include $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(CP) -rv $(BASE_INSTALL_DIR)/lib $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(CP) -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	
 	# create the underlying tars of the debian package
 	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
