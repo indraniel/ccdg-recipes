@@ -90,7 +90,7 @@ BASE=$(DEB_BASE_INSTALL)
 export LD_LIBRARY_PATH=$${BASE}/lib:$${BASE}/lib/root:$${LD_LIBRARY_PATH}
 export PATH=$${BASE}/bin:$${PATH}
 
-$${BASE}/bin/cnvnator-$(CNVNATOR_VERSION) $$@
+exec $${BASE}/bin/cnvnator-$(CNVNATOR_VERSION) "$$@"
 endef
 export cnvnator_wrapper
 
@@ -103,7 +103,7 @@ BASE=$(DEB_BASE_INSTALL)
 export LD_LIBRARY_PATH=$${BASE}/lib:$${BASE}/lib/root:$${LD_LIBRARY_PATH}
 export PATH=$${BASE}/bin:$${PATH}
 
-$${BASE}/bin/root.exe $$@
+exec $${BASE}/bin/root.exe "$$@"
 endef
 export root_wrapper
 
