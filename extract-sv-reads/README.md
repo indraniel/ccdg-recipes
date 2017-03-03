@@ -18,4 +18,4 @@ comment out the "COPY" commands in the Dockerfile, and then run:
     # inside the container
     cd /release
     # manually install the prerequisites for the package
-    dpkg --install ccdg-extract-sv-reads-0.6.5_0.6.5-1ubuntu14.04.deb
+    dpkg --install extract-sv-reads1.1-1.1.0-Linux-x86_64.deb
