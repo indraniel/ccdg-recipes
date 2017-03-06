@@ -18,7 +18,7 @@ RELEASE_DIR      := /release
 
 # source information. XSVR is short for EXTRACT_SV_READS
 XSVR_MAIN_VERSION	:= 1.1
-XSVR_VERSION    	:= 1.1.0
+XSVR_VERSION    	:= 1.1.2
 XSVR_URL			:= https://github.com/hall-lab/extract_sv_reads/
 XSVR_SRC			:= $(RESOURCES_DIR)/extract_sv_reads
 XSVR_BUILD_DIR		:= $(WORK_DIR)/xsvr_build
