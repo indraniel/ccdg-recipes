@@ -226,10 +226,10 @@ debian:
 	
 	# create the "wrapper" scripts for cnvnator and root
 	mkdir -p $(DEB_BUILD_DIR)/usr/local/bin
-	echo "$$cnvnator_wrapper" >$(DEB_BUILD_DIR)/usr/local/bin/cnvnator
-	chmod a+x $(DEB_BUILD_DIR)/usr/local/bin/cnvnator
-	echo "$$root_wrapper" >$(DEB_BUILD_DIR)/usr/local/bin/root
-	chmod a+x $(DEB_BUILD_DIR)/usr/local/bin/root
+	echo "$$cnvnator_wrapper" >$(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/cnvnator
+	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/cnvnator
+	echo "$$root_wrapper" >$(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/root
+	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/root
 	
 	# create the underlying tars of the debian package
 	tar cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt usr
