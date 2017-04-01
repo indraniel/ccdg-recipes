@@ -36,7 +36,7 @@ SAMTOOLS_LIB       := $(CNVNATOR_SRC_DIR)/samtools/libbam.a
 
 DEB_BUILD_DIR       := $(BASE_DIR)/deb-build
 UBUNTU_EDITION      := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
-DEB_RELEASE_VERSION := 1ubuntu$(UBUNTU_EDITION)
+DEB_RELEASE_VERSION := 2ubuntu$(UBUNTU_EDITION)
 DEB_PKG             := ccdg-cnvnator-$(CNVNATOR_VERSION)_$(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(BASE_DIR)/$(DEB_PKG)
 DEB_BASE_INSTALL    := /opt/ccdg/cnvnator-$(CNVNATOR_VERSION)
@@ -156,7 +156,7 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: libc6, zlib1g, libgomp1, libstdc++6, libgcc1, libxpm4, ccdg-python-2.7.12
+Depends: libc6, libc6-dev, zlib1g, libgomp1, libstdc++6, libstdc++-4.8-dev, libgcc1, g++, libxpm4, ccdg-python-2.7.12
 Description: An unofficial WUSTL MGI package of CNVnator ( $(CNVNATOR_VERSION) )
 Version: $(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION)
 endef

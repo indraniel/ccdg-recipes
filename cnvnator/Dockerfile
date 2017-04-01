@@ -22,6 +22,8 @@ RUN apt-get update -qq && \
     ccdg-python-2.7.12 \
     libgomp1 \
     libstdc++6 \
+    libstdc++-4.8-dev \
+    g++ \
     libgcc1 \
     libxpm4 \
     libxpm-dev \
