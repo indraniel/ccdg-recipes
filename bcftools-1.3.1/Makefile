@@ -66,6 +66,7 @@ fi
 endef
 export debian_postrm
 
+# BCFTOOLS EXECUTABLE DEBIAN WRAPPER ###########################################################
 define bcftools_wrapper
 #!/bin/bash
 
