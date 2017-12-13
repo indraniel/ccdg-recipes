@@ -47,7 +47,7 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: libc6, libcurl3, zlib1g, ca-certificates, libncurses5
+Depends: libc6, libcurl3, zlib1g, ca-certificates, libncurses5, libbz2-1.0, liblzma5, libssl1.0.0
 Description: samtools-$(SAMTOOLS_VERSION) plus htslib-$(HTSLIB_VERSION) for the CCDG pipeline
 Version: $(SAMTOOLS_VERSION)-$(DEB_RELEASE_VERSION)
 endef
