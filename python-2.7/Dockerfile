@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM debian:stretch-slim
 MAINTAINER Indraniel Das <idas@wustl.edu>
 
 # Volumes
@@ -24,4 +24,4 @@ WORKDIR /build
 #COPY ./resources /src/resources
 COPY ./Makefile /build
 
-CMD make
+#CMD make

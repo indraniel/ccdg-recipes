@@ -20,32 +20,32 @@ WORK_DIR         := /build
 BASE_INSTALL_DIR := $(WORK_DIR)
 RELEASE_DIR      := /release
 
-PYTHON_VERSION      := 2.7.12
+PYTHON_VERSION      := 2.7.15
 PYTHON_REPO         := https://github.com/yyuu/pyenv.git
 PYTHON_BUILD_DIR    := /build/py-$(PYTHON_VERSION)
-PYTHON_INSTALL_DIR  := /opt/ccdg/python-$(PYTHON_VERSION)
+PYTHON_INSTALL_DIR  := /opt/hall-lab/python-$(PYTHON_VERSION)
 PYTHON_BIN          := $(PYTHON_INSTALL_DIR)/bin/python
 
 BUILD_DEPENDENCIES := /build/dependencies
 
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
-UBUNTU_EDITION      := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
-DEB_RELEASE_VERSION := 1ubuntu$(UBUNTU_EDITION)
-DEB_PKG             := ccdg-python-$(PYTHON_VERSION)_$(PYTHON_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEBIAN_EDITION      := $(shell cat /etc/debian_version)
+DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
+DEB_PKG             := hall-lab-python-$(PYTHON_VERSION)_$(PYTHON_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
-DEB_BASE_INSTALL    := /opt/ccdg/python-$(PYTHON_VERSION)
+DEB_BASE_INSTALL    := /opt/hall-lab/python-$(PYTHON_VERSION)
 
 all: $(DEB_PKG_PATH)
 
 # DEBIAN CONTROL FILE ##########################################################
 define debian_control
-Package: ccdg-python-$(PYTHON_VERSION)
+Package: hall-lab-python-$(PYTHON_VERSION)
 Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: make, libncursesw5, libreadline6, libssl1.0.0, libdb5.3, libc6, libsqlite3-0, sqlite3, libbz2-1.0, zlib1g
-Description: python2.7 for MGI's CCDG pipeline ( $(PYTHON_VERSION) )
+Depends: make, libncursesw5, libreadline7, libssl1.1, libdb5.3, libc6, libsqlite3-0, sqlite3, libbz2-1.0, zlib1g
+Description: python2.7 for Hall Lab ( $(PYTHON_VERSION) )
 Version: $(PYTHON_VERSION)-$(DEB_RELEASE_VERSION)
 endef
 export debian_control
