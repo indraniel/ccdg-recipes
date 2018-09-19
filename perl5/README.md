@@ -18,5 +18,5 @@ comment out the "COPY" commands in the Dockerfile, and then run:
     # inside the container
     cd /release
     # manually install the prerequisites for the package
-    apt-get install make libc6
-    dpkg --install ccdg-perl-5.24.0_5.24.0-1ubuntu14.04.deb
+    apt-get install make libc6 libssl1.1
+    dpkg --install hall-lab-perl-5.28.0_5.28.0-1debian9.5.deb

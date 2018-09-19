@@ -15,37 +15,38 @@ ECHO    := /bin/echo
 AR      := /usr/bin/ar
 TEST    := /usr/bin/test
 BPERL   := /usr/bin/perl
+RSYNC   := /usr/bin/rsync
 
 # basic workspace directories
 WORK_DIR         := /build
 BASE_INSTALL_DIR := $(WORK_DIR)
 RELEASE_DIR      := /release
 
-PERL_VERSION      := 5.24.0
+PERL_VERSION      := 5.28.0
 PERL_BUILDER      := https://raw.githubusercontent.com/tokuhirom/Perl-Build/master/perl-build
-PERL_INSTALL_DIR  := /opt/ccdg/perl-$(PERL_VERSION)
+PERL_INSTALL_DIR  := /opt/hall-lab/perl-$(PERL_VERSION)
 PERL_BIN          := $(PERL_INSTALL_DIR)/bin/perl
 
 BUILD_DEPENDENCIES := /build/dependencies
 
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
-UBUNTU_EDITION      := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
-DEB_RELEASE_VERSION := 1ubuntu$(UBUNTU_EDITION)
-DEB_PKG             := ccdg-perl-$(PERL_VERSION)_$(PERL_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEBIAN_EDITION      := $(shell cat /etc/debian_version)
+DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
+DEB_PKG             := hall-lab-perl-$(PERL_VERSION)_$(PERL_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
-DEB_BASE_INSTALL    := /opt/ccdg/perl-$(PERL_VERSION)
+DEB_BASE_INSTALL    := /opt/hall-lab/perl-$(PERL_VERSION)
 
 all: $(DEB_PKG_PATH)
 
 # DEBIAN CONTROL FILE ##########################################################
 define debian_control
-Package: ccdg-perl-$(PERL_VERSION)
+Package: hall-lab-perl-$(PERL_VERSION)
 Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: make, libc6
-Description: perl for MGI's CCDG pipeline ( $(PERL_VERSION) )
+Depends: make, libc6, libssl1.1
+Description: perl for Hall Lab ( $(PERL_VERSION) )
 Version: $(PERL_VERSION)-$(DEB_RELEASE_VERSION)
 endef
 export debian_control
@@ -77,7 +78,7 @@ $(DEB_PKG_PATH): $(PERL_BIN)
 	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	
 	# install the compiled perl build directory
-	$(CP) -rv $(PERL_INSTALL_DIR)/* $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(RSYNC) -rvp $(PERL_INSTALL_DIR)/* $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	
 	# create the underlying tars of the debian package
 	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
@@ -91,12 +92,18 @@ $(DEB_PKG_PATH): $(PERL_BIN)
 $(PERL_BIN): | $(BUILD_DEPENDENCIES)
 	$(CURL) $(PERL_BUILDER) | \
 		$(BPERL) - $(PERL_VERSION) $(PERL_INSTALL_DIR)
+	curl -L https://cpanmin.us | $(PERL_BIN) - App::cpanminus
+	$(PERL_INSTALL_DIR)/bin/cpanm --self-upgrade
+	chmod 0755 $(PERL_INSTALL_DIR)/bin/cpanm
+	$(PERL_INSTALL_DIR)/bin/cpanm local::lib
 
 $(BUILD_DEPENDENCIES):
 	$(APT_GET) update
 	$(APT_GET) install -y build-essential
 	$(APT_GET) install -y \
-		libc6-dev
+		libssl-dev \
+		libc6-dev \
+		rsync
 	$(TOUCH) $(BUILD_DEPENDENCIES)
 
 # apt-get install gfortran libjpeg8 zip unzip libtiff5 libx11-6 libxt6 libcairo2 libpango1.0-0 libpangocairo-1.0-0 libcurl4-openssl-dev libxmu6
