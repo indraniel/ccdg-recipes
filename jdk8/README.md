@@ -17,4 +17,4 @@ comment out the "COPY" commands in the Dockerfile, and then run:
 
     # inside the container
     cd /release
-    dpkg --install ccdg-oracle-jdk-8u111_8u111-1ubuntu14.04.deb
+    dpkg --install hall-lab-oracle-jdk-8u181_8u181-1debian9.5.deb

@@ -19,28 +19,28 @@ RESOURCES_DIR    := $(WORK_DIR)/resources
 RELEASE_DIR      := /release
 
 # source code information
-JDK8_VERSION    := 8u111
-JAVA_URL        := http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-x64.tar.gz
-JDK8_TGZ        := $(RESOURCES_DIR)/jdk-8u111-linux-x64.tar.gz
-JDK8_OUTPUT_DIR := $(WORK_DIR)/jdk1.8.0_111
+JDK8_VERSION    := 8u181
+JAVA_URL        := http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jdk-8u181-linux-x64.tar.gz
+JDK8_TGZ        := $(RESOURCES_DIR)/jdk-8u181-linux-x64.tar.gz
+JDK8_OUTPUT_DIR := $(WORK_DIR)/jdk1.8.0_181
 JAVA            := $(JDK8_OUTPUT_DIR)/bin/java
 
 # debian packaging related variables
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
-UBUNTU_EDITION      := $(shell . /etc/lsb-release; $(ECHO) $$DISTRIB_RELEASE)
-DEB_RELEASE_VERSION := 1ubuntu$(UBUNTU_EDITION)
-DEB_PKG             := ccdg-oracle-jdk-$(JDK8_VERSION)_$(JDK8_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEBIAN_EDITION      := $(shell cat /etc/debian_version)
+DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
+DEB_PKG             := hall-lab-oracle-jdk-$(JDK8_VERSION)_$(JDK8_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
-DEB_BASE_INSTALL    := /opt/ccdg/jdk-$(JDK8_VERSION)
+DEB_BASE_INSTALL    := /opt/hall-lab/jdk-$(JDK8_VERSION)
 
 # DEBIAN CONTROL FILE ##########################################################
 define debian_control
-Package: ccdg-oracle-jdk-$(JDK8_VERSION)
+Package: hall-lab-oracle-jdk-$(JDK8_VERSION)
 Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Description: Java/JDK used for the CCDG pipeline ( $(JDK8_VERSION) )
+Description: Java/JDK used for Hall Lab ( $(JDK8_VERSION) )
 Version: $(JDK8_VERSION)-$(DEB_RELEASE_VERSION)
 endef
 export debian_control
