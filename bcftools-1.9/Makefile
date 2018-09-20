@@ -31,6 +31,8 @@ DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
 DEB_PKG             := hall-lab-bcftools-$(BCFTOOLS_VERSION)_$(BCFTOOLS_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
 DEB_BASE_INSTALL    := /opt/hall-lab/bcftools-$(BCFTOOLS_VERSION)
+DEBIAN_PROFILE_DIR  := /etc/profile.d
+BCFTOOLS_PROFILE    := $(DEBIAN_PROFILE_DIR)/hall-lab-bcftools.sh
 
 # DEBIAN CONTROL FILE ##########################################################
 define debian_control
@@ -50,13 +52,26 @@ define debian_postrm
 #!/bin/bash
 
 BASE=$(DEB_BASE_INSTALL)
+PROFILE_SCRIPT=$(BCFTOOLS_PROFILE)
 
 if [ -e $${BASE} ]; then
     $(RM) -rfv $${BASE}
 fi
 
+if [ -e $${PROFILE_SCRIPT} ]; then
+	$(RM) -fv $${PROFILE_SCRIPT}
+fi
+
 endef
 export debian_postrm
+
+# BCFTOOLS PATH CONFIGURATION ###########################################################
+define bcftools_path_set
+#!/bin/bash
+
+PATH=${DEB_BASE_INSTALL}/bin:$$PATH
+endef
+export bcftools_path_set
 
 # BCFTOOLS EXECUTABLE DEBIAN WRAPPER ###########################################################
 define bcftools_wrapper
@@ -83,6 +98,7 @@ debian: | $(BCFTOOLS)
 	
 	# create the "installed" file directory structure
 	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEBIAN_PROFILE_DIR)
 
 	$(CP) -rv $(BASE_INSTALL_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	$(CP) -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
@@ -91,9 +107,12 @@ debian: | $(BCFTOOLS)
 	# wrapper script to set bcftools plugin environment variable
 	echo "$$bcftools_wrapper" > $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/bcftools
 	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/bcftools
+
+	# add hall-lab bcftools path for all users in login shells
+	echo "$$bcftools_path_set" > ${DEB_BUILD_DIR}/$(BCFTOOLS_PROFILE)
 	
 	# create the underlying tars of the debian package
-	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
+	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt etc
 	$(TAR) cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control postrm
 	
 	# assemble the formal "deb" package
