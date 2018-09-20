@@ -41,7 +41,7 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: libc6, libcurl3, zlib1g, ca-certificates, libbz2-1.0, liblzma5, libssl1.0.2
+Depends: libc6, libcurl3, zlib1g, ca-certificates, libbz2-1.0, liblzma5, libssl1.0.2, hall-lab-htslib-1.9
 Description: bcftools-$(BCFTOOLS_VERSION) for the Hall Lab 
 Version: $(BCFTOOLS_VERSION)-$(DEB_RELEASE_VERSION)
 endef
