@@ -24,14 +24,6 @@ BCFTOOLS_ZIP        := $(RESOURCES_DIR)/bcftools-$(BCFTOOLS_VERSION).tar.bz2
 BCFTOOLS_OUTPUT_DIR := $(WORK_DIR)/bcftools-$(BCFTOOLS_VERSION)
 BCFTOOLS            := $(WORK_DIR)/bin/bcftools
 
-# source code information
-HTSLIB_VERSION    := 1.9
-HTSLIB_URL        := https://github.com/samtools/htslib/releases/download/$(HTSLIB_VERSION)/htslib-$(HTSLIB_VERSION).tar.bz2
-HTSLIB_ZIP        := $(RESOURCES_DIR)/htslib-$(HTSLIB_VERSION).tar.bz2
-HTSLIB_OUTPUT_DIR := $(WORK_DIR)/htslib-$(HTSLIB_VERSION)
-TABIX             := $(WORK_DIR)/bin/tabix
-BGZIP             := $(WORK_DIR)/bin/bgzip
-
 # debian packaging related variables
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
 DEBIAN_EDITION      := $(shell cat /etc/debian_version)
@@ -47,8 +39,8 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: libc6, libcurl3, zlib1g, ca-certificates, libbz2-1.0, liblzma5, libssl1.1
-Description: bcftools-$(BCFTOOLS_VERSION) plus htslib-$(HTSLIB_VERSION) for the Hall Lab 
+Depends: libc6, libcurl3, zlib1g, ca-certificates, libbz2-1.0, liblzma5, libssl1.0.2
+Description: bcftools-$(BCFTOOLS_VERSION) for the Hall Lab 
 Version: $(BCFTOOLS_VERSION)-$(DEB_RELEASE_VERSION)
 endef
 export debian_control
@@ -93,8 +85,6 @@ debian: | $(BCFTOOLS)
 	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 
 	$(CP) -rv $(BASE_INSTALL_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	$(CP) -rv $(BASE_INSTALL_DIR)/include $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	$(CP) -rv $(BASE_INSTALL_DIR)/lib $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	$(CP) -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	$(CP) -rv $(BASE_INSTALL_DIR)/libexec $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 
@@ -111,29 +101,17 @@ debian: | $(BCFTOOLS)
 		$(AR) rc $(DEB_PKG) debian-binary control.tar.gz data.tar.gz && \
 		$(MV) $(DEB_PKG) $(RELEASE_DIR)
 
-$(BCFTOOLS): $(BCFTOOLS_ZIP) $(TABIX) $(BGZIP)
+$(BCFTOOLS): $(BCFTOOLS_ZIP)
 	$(TAR) -jxvf $(BCFTOOLS_ZIP) \
 		&& cd $(BCFTOOLS_OUTPUT_DIR) \
-		&& make all HTSDIR=$(HTSLIB_OUTPUT_DIR) prefix="$(BASE_INSTALL_DIR)" LIBS="-lcurl -lcrypto -lssl" \
-		&& make install HTSDIR=$(HTSLIB_OUTPUT_DIR) prefix="$(BASE_INSTALL_DIR)" LIBS="-lcurl -lcrypto -lssl" \
+		&& ./configure --with-htslib=/opt/hall-lab/htslib-${BCFTOOLS_VERSION} --prefix="$(BASE_INSTALL_DIR)" \
+		&& make install \
 		&& $(MV) $(BCFTOOLS) $(BCFTOOLS)-$(BCFTOOLS_VERSION)
 
 $(BCFTOOLS_ZIP):
 	mkdir -p $(RESOURCES_DIR)
 	cd $(RESOURCES_DIR) && \
 		$(CURL) -L -O $(BCFTOOLS_URL)
-
-$(TABIX) $(BGZIP): $(HTSLIB_ZIP)
-	$(TAR) -jxvf $(HTSLIB_ZIP) \
-		&& cd $(HTSLIB_OUTPUT_DIR) \
-		&& ./configure --enable-libcurl --prefix=$(BASE_INSTALL_DIR) \
-		&& make lib-static \
-		&& make install
-
-$(HTSLIB_ZIP):
-	mkdir -p $(RESOURCES_DIR)
-	cd $(RESOURCES_DIR) && \
-		$(CURL) -L -O $(HTSLIB_URL)
 
 debclean:
 	if [ -e $(DEB_BUILD_DIR) ]; then $(RM) -rf $(DEB_BUILD_DIR); fi
