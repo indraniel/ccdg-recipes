@@ -2,7 +2,7 @@ FROM debian:stretch-slim
 LABEL maintainer "Dave Larson <delarson@wustl.edu>"
 
 # Volumes
-VOLUME /build
+#VOLUME /build
 VOLUME /release
 
 ARG LIBDEFLATE_VERSION=1.0
@@ -18,7 +18,7 @@ RUN apt-get update -qq && \
     bzip2 \
     libbz2-dev \
     liblzma-dev \
-    libssl-dev \
+    libssl1.0-dev \
     libcurl4-openssl-dev \
     ca-certificates \
     curl \
@@ -37,5 +37,6 @@ WORKDIR /build
 
 # Import resources
 COPY ./Makefile /build
+RUN make build
 
-CMD make
+CMD ["make", "debian"]
