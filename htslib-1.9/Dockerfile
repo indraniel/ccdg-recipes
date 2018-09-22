@@ -22,7 +22,6 @@ RUN apt-get update -qq && \
     libcurl4-openssl-dev \
     ca-certificates \
     curl \
-    zlib1g \
     zlib1g-dev \
     --no-install-recommends \
     && git clone https://github.com/ebiggers/libdeflate.git \
@@ -39,4 +38,4 @@ WORKDIR /build
 COPY ./Makefile /build
 RUN make debian-build
 
-CMD ["make", "debian"]
+CMD make

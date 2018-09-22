@@ -1,4 +1,4 @@
-.PHONY: clean debian debclean
+.PHONY: clean debian debian-build debclean
 
 # external commands used
 CURL  := /usr/bin/curl
@@ -57,8 +57,6 @@ fi
 
 endef
 export debian_postrm
-
-.PHONY: all debian-build debian clean debclean
 
 all: debian
 
