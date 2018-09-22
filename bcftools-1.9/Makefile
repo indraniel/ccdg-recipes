@@ -1,4 +1,4 @@
-.PHONY: clean debian debclean
+.PHONY: clean debian debian-build debclean
 
 # external commands used
 CURL  := /usr/bin/curl
@@ -31,18 +31,15 @@ DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
 DEB_PKG             := hall-lab-bcftools-$(BCFTOOLS_VERSION)_$(BCFTOOLS_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
 DEB_BASE_INSTALL    := /opt/hall-lab/bcftools-$(BCFTOOLS_VERSION)
-DEBIAN_PROFILE_DIR  := /etc/profile.d
-BCFTOOLS_PROFILE    := $(DEBIAN_PROFILE_DIR)/hall-lab-bcftools.sh
 
 # DEBIAN CONTROL FILE ##########################################################
 define debian_control
 Package: hall-lab-bcftools-$(BCFTOOLS_VERSION)
 Architecture: amd64
 Section: science
-Maintainer: Indraniel Das <idas@wustl.edu>
+Maintainer: Dave Larson <delarson@wustl.edu>
 Priority: optional
-Depends: libc6, libcurl3, zlib1g, ca-certificates, libbz2-1.0, liblzma5, libssl1.0.2, hall-lab-htslib-1.9
-Suggests: texlive-base, hall-lab-python-2.7.15, hall-lab-python-2.7.15-matplotlib, hall-lab-perl-5.28.0
+Depends: libc6, libcurl3, zlib1g, ca-certificates, libbz2-1.0, liblzma5, libssl1.0.2
 Description: bcftools-$(BCFTOOLS_VERSION) for the Hall Lab 
 Version: $(BCFTOOLS_VERSION)-$(DEB_RELEASE_VERSION)
 endef
@@ -53,26 +50,13 @@ define debian_postrm
 #!/bin/bash
 
 BASE=$(DEB_BASE_INSTALL)
-PROFILE_SCRIPT=$(BCFTOOLS_PROFILE)
 
 if [ -e $${BASE} ]; then
     $(RM) -rfv $${BASE}
 fi
 
-if [ -e $${PROFILE_SCRIPT} ]; then
-	$(RM) -fv $${PROFILE_SCRIPT}
-fi
-
 endef
 export debian_postrm
-
-# BCFTOOLS PATH CONFIGURATION ###########################################################
-define bcftools_path_set
-#!/bin/bash
-
-PATH=${DEB_BASE_INSTALL}/bin:$$PATH
-endef
-export bcftools_path_set
 
 # BCFTOOLS EXECUTABLE DEBIAN WRAPPER ###########################################################
 define bcftools_wrapper
@@ -88,7 +72,17 @@ export bcftools_wrapper
 
 all: debian
 
-debian: | $(BCFTOOLS)
+debian: debian-build
+	# create the underlying tars of the debian package
+	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
+	$(TAR) cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control postrm
+	
+	# assemble the formal "deb" package
+	cd $(DEB_BUILD_DIR) && \
+		$(AR) rc $(DEB_PKG) debian-binary control.tar.gz data.tar.gz && \
+		$(MV) $(DEB_PKG) $(RELEASE_DIR)
+
+debian-build: | $(BCFTOOLS)
 	# setup the directory
 	$(TEST) -d $(DEB_BUILD_DIR) || $(MKDIR) $(DEB_BUILD_DIR)
 	
@@ -99,7 +93,6 @@ debian: | $(BCFTOOLS)
 	
 	# create the "installed" file directory structure
 	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEBIAN_PROFILE_DIR)
 
 	$(CP) -rv $(BASE_INSTALL_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	$(CP) -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
@@ -109,22 +102,10 @@ debian: | $(BCFTOOLS)
 	echo "$$bcftools_wrapper" > $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/bcftools
 	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/bcftools
 
-	# add hall-lab bcftools path for all users in login shells
-	echo "$$bcftools_path_set" > ${DEB_BUILD_DIR}/$(BCFTOOLS_PROFILE)
-	
-	# create the underlying tars of the debian package
-	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt etc
-	$(TAR) cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control postrm
-	
-	# assemble the formal "deb" package
-	cd $(DEB_BUILD_DIR) && \
-		$(AR) rc $(DEB_PKG) debian-binary control.tar.gz data.tar.gz && \
-		$(MV) $(DEB_PKG) $(RELEASE_DIR)
-
 $(BCFTOOLS): $(BCFTOOLS_ZIP)
 	$(TAR) -jxvf $(BCFTOOLS_ZIP) \
 		&& cd $(BCFTOOLS_OUTPUT_DIR) \
-		&& ./configure --with-htslib=/opt/hall-lab/htslib-${BCFTOOLS_VERSION} --prefix="$(BASE_INSTALL_DIR)" \
+		&& ./configure --enable-libcurl --with-libdeflate --prefix="$(BASE_INSTALL_DIR)" \
 		&& make install \
 		&& $(MV) $(BCFTOOLS) $(BCFTOOLS)-$(BCFTOOLS_VERSION)
 
@@ -139,6 +120,5 @@ debclean:
 
 clean:
 	if [ -e $(BCFTOOLS_OUTPUT_DIR) ]; then $(RM) -rf $(BCFTOOLS_OUTPUT_DIR); fi
-	if [ -e $(HTSLIB_OUTPUT_DIR) ]; then $(RM) -rf $(HTSLIB_OUTPUT_DIR); fi
 	if [ -e $(DEB_BUILD_DIR) ]; then $(RM) -rf $(DEB_BUILD_DIR); fi
 	if [ -e $(DEB_PKG_PATH) ]; then $(RM) -rf $(DEB_PKG_PATH); fi
