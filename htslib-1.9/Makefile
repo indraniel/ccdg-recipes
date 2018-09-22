@@ -58,9 +58,11 @@ fi
 endef
 export debian_postrm
 
+.PHONY: all debian-build debian clean debclean
+
 all: debian
 
-debian: | $(HTSLIB)
+debian-build: | $(HTSLIB)
 	# setup the directory
 	$(TEST) -d $(DEB_BUILD_DIR) || $(MKDIR) $(DEB_BUILD_DIR)
 	
@@ -77,6 +79,7 @@ debian: | $(HTSLIB)
 	$(CP) -rv $(BASE_INSTALL_DIR)/lib $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 	$(CP) -rv $(BASE_INSTALL_DIR)/share $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
 
+debian: debian-build
 	# create the underlying tars of the debian package
 	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
 	$(TAR) cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control postrm
