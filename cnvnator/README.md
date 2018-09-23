@@ -1,19 +1,19 @@
 # production mode
 
-    docker build -t cnvnator-0.3.3:v1 .
-    docker run -i -t -v $PWD:/release --rm cnvnator-0.3.3:v1
+    docker build -t cnvnator-0.3.3-build:v1 .
+    docker run -i -t -v $PWD:/release --rm cnvnator-0.3.3-build:v1
 
 # Development Mode
 
-comment out the "COPY" commands in the Dockerfile, and then run:
+comment out the "COPY" commands in the Dockerfile AND uncomment the VOLUME /build command, and then run:
 
-    docker build -t cnvnator-0.3.3:v1 .
-    docker run -i -t -v $PWD:/build --rm cnvnator-0.3.3:v1 bash
+    docker build -t cnvnator-0.3.3-build:v1 .
+    docker run -i -t -v $PWD:/build --rm cnvnator-0.3.3-build:v1 bash
 
 # Testing
 
-    docker build -t cnvnator-0.3.3:v1 .
-    docker run -i -t -v $PWD:/release --rm cnvnator-0.3.3:v1 bash
+    docker build -t cnvnator-0.3.3-build:v1 .
+    docker run -i -t -v $PWD:/release --rm cnvnator-0.3.3-build:v1 bash
 
     # inside the container
     cd /release

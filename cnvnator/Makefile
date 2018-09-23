@@ -1,4 +1,4 @@
-.PHONY: clean debian
+.PHONY: clean debian debian-build
 
 CNVNATOR_VERSION  := 0.3.3
 
@@ -204,7 +204,9 @@ fi
 endef
 export debian_postrm
 
-debian:
+all: debian
+
+debian-build: build
 	# setup the directory
 	test -d $(DEB_BUILD_DIR) || mkdir $(DEB_BUILD_DIR)
 	
@@ -230,7 +232,8 @@ debian:
 	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/cnvnator
 	echo "$$root_wrapper" >$(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/root
 	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/root
-	
+
+debian: debian-build	
 	# create the underlying tars of the debian package
 	tar cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt usr
 	tar cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control preinst postrm
