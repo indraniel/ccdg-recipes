@@ -1,19 +1,19 @@
 # Production mode
 
     docker build -t python2-build:v1 .
-    docker run -i -t -v $PWD:/release --rm python2-build:v1
+    docker run -i -t -v $PWD:/release --rm python2.7-build:v1
 
 # Development Mode
 
 comment out the "COPY" commands in the Dockerfile AND uncomment the VOLUME /build command, and then run:
 
-    docker build -t python2-build:v1 .
-    docker run -i -t -v $PWD:/build --rm python2-build:v1 bash
+    docker build -t python2.7-build:v1 .
+    docker run -i -t -v $PWD:/build --rm python2.7-build:v1 bash
 
 # Testing
 
-    docker build -t python2-build:v1 .
-    docker run -i -t -v $PWD:/release --rm python2-build:v1 bash
+    docker build -t python2.7-build:v1 .
+    docker run -i -t -v $PWD:/release --rm python2.7-build:v1 bash
 
     # inside the container
     cd /release
