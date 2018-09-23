@@ -2,7 +2,7 @@ FROM debian:stretch-slim
 MAINTAINER Indraniel Das <idas@wustl.edu>
 
 # Volumes
-VOLUME /build
+#VOLUME /build
 VOLUME /release
 
 # bootstrap build dependencies
@@ -23,5 +23,6 @@ WORKDIR /build
 # Import resources
 #COPY ./resources /src/resources
 COPY ./Makefile /build
+RUN make debian-build
 
-#CMD make
+CMD make
