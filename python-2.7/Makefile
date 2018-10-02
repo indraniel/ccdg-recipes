@@ -1,4 +1,4 @@
-.PHONY: clean debian
+.PHONY: clean debian debian-build
 
 # external commands used
 APT_GET := /usr/bin/apt-get
@@ -63,8 +63,18 @@ endef
 export debian_postrm
 
 all: $(DEB_PKG_PATH)
-
+	
 $(DEB_PKG_PATH): $(PYTHON_BIN)
+	# create the underlying tars of the debian package
+	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
+	$(TAR) cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control postrm
+	
+	# assemble the formal "deb" package
+	cd $(DEB_BUILD_DIR) && \
+		$(AR) rc $(DEB_PKG) debian-binary control.tar.gz data.tar.gz && \
+		$(MV) $(DEB_PKG) $(RELEASE_DIR)
+
+debian-build: $(PYTHON_BIN)
 	# setup the directory
 	$(TEST) -d $(DEB_BUILD_DIR) || $(MKDIR) $(DEB_BUILD_DIR)
 	
@@ -78,15 +88,6 @@ $(DEB_PKG_PATH): $(PYTHON_BIN)
 	
 	# install the compiled R build directory
 	$(CP) -rv $(PYTHON_INSTALL_DIR)/* $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-	
-	# create the underlying tars of the debian package
-	$(TAR) cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt
-	$(TAR) cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control postrm
-	
-	# assemble the formal "deb" package
-	cd $(DEB_BUILD_DIR) && \
-		$(AR) rc $(DEB_PKG) debian-binary control.tar.gz data.tar.gz && \
-		$(MV) $(DEB_PKG) $(RELEASE_DIR)
 
 $(PYTHON_BIN): | $(BUILD_DEPENDENCIES) $(PYTHON_BUILD_DIR) 
 	PYTHON_CONFIGURE_OPTS="--enable-shared" $(PYTHON_BUILD_DIR)/bin/python-build \
