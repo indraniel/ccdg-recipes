@@ -18,4 +18,6 @@ comment out the "COPY" commands in the Dockerfile AND uncomment the VOLUME /buil
     # inside the container
     cd /release
     # manually install the prerequisites for the package
+    apt-get install libc6 libcurl3 zlib1g ca-certificates libbz2-1.0 liblzma5 libssl1.0.2
+    # actually install the pacakge of interest
     dpkg --install hall-lab-htslib-1.9_1.9-1debian9.5.deb
