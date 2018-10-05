@@ -42,7 +42,7 @@ BUILD_DEPENDENCIES := /build/dependencies
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
 DEBIAN_EDITION      := $(shell cat /etc/debian_version)
 DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
-DEB_PKG             := hall-lab-r-$(R_VERSION)-mkl-$(INTEL_MKL_VERSION)_$(R_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEB_PKG             := hall-lab-r-$(R_VERSION)_$(R_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
 DEB_BASE_INSTALL    := /opt/hall-lab/R-$(R_VERSION)
 
@@ -50,7 +50,7 @@ all: $(DEB_PKG_PATH)
 
 # DEBIAN CONTROL FILE ##########################################################
 define debian_control
-Package: hall-lab-r-$(R_VERSION)-mkl-$(INTEL_MKL_VERSION)
+Package: hall-lab-r-$(R_VERSION)
 Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
@@ -78,7 +78,7 @@ define rscript_wrapper
 #!/bin/bash
 
 BASE=$(DEB_BASE_INSTALL)
-export LD_LIBRARY_PATH==$(INTEL_MKL_LIBS_DIR):$$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$(INTEL_MKL_LIBS_DIR):$$LD_LIBRARY_PATH
 
 exec $${BASE}/bin/Rscript-mkl "$$@"
 endef
@@ -133,20 +133,21 @@ $(R_BIN): | $(BUILD_DEPENDENCIES) $(R_BUILD_DIR)
 					--with-gnu-ld \
 					--with-x
 	cd $(R_BUILD_DIR) && make
-	cd $(R_BUILD_DIR) && make check
+	#cd $(R_BUILD_DIR) && make check
 	cd $(R_BUILD_DIR) && make install
 
 	# adjust the final R executable (include the location of the Intel MKL libraries)
 	$(MV) $(R_INSTALL_DIR)/bin/R $(R_INSTALL_DIR)/bin/R.orig
 	$(HEAD) -n 2 $(R_INSTALL_DIR)/bin/R.orig > $(R_INSTALL_DIR)/bin/R
 	$(ECHO) -e "\nexport LD_LIBRARY_PATH=$(INTEL_MKL_LIBS_DIR):\$$LD_LIBRARY_PATH" >>$(R_INSTALL_DIR)/bin/R
-	$(TAIL) -n +3 $(R_INSTALL_DIR)/bin/R.org >> $(R_INSTALL_DIR)/bin/R
+	$(TAIL) -n +3 $(R_INSTALL_DIR)/bin/R.orig >> $(R_INSTALL_DIR)/bin/R
 	$(RM) $(R_INSTALL_DIR)/bin/R.orig
+	$(CHMOD) 0755 $(R_INSTALL_DIR)/bin/R
 
 	# adjust the final Rscript executable -- make a wrapper to it
 	$(MV) $(R_INSTALL_DIR)/bin/Rscript $(R_INSTALL_DIR)/bin/Rscript-mkl
-	$(ECHO) "$$rscript_wrapper" > $(R_INSTALL_DIR)/Rscript
-	$(CHMOD) 0755 $(R_INSTALL_DIR)/Rscript
+	$(ECHO) "$$rscript_wrapper" > $(R_INSTALL_DIR)/bin/Rscript
+	$(CHMOD) 0755 $(R_INSTALL_DIR)/bin/Rscript
 
 $(R_BUILD_DIR): $(R_BUILD_TAR)
 	cd /build && $(TAR) zxvf $(R_SRC_TAR)
@@ -156,6 +157,7 @@ $(R_BUILD_TAR):
 
 $(BUILD_DEPENDENCIES):
 	$(APT_GET) update
+	$(APT_GET) install -y intel-mkl-core-rt-2019.0-117 intel-mkl-gnu-rt-2019.0-117 intel-mkl-gnu-f-rt-2019.0-117 intel-mkl-common-2019.0-117 intel-mkl-common-c-2019.0-117 intel-mkl-common-f-2019.0-117
 	$(APT_GET) install -y build-essential
 	$(APT_GET) install -y gcc
 	$(APT_GET) install -y g++
