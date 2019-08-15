@@ -31,7 +31,7 @@ RFMIX2            := $(RFMIX2_OUTPUT_DIR)/bin/rfmix
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
 DEBIAN_EDITION      := $(shell cat /etc/debian_version)
 DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
-DEB_PKG             := hall-lab-rfmix2-$(RFMIX2_VERSION)_$(RFMIX2_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEB_PKG             := hall-lab-rfmix-$(RFMIX2_VERSION)_$(RFMIX2_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(RELEASE_DIR)/$(DEB_PKG)
 DEB_BASE_INSTALL    := /opt/hall-lab/rfmix-$(RFMIX2_VERSION)
 
