@@ -30,6 +30,6 @@ WORKDIR /build
 
 # Import resources
 COPY ./Makefile /build
-RUN make debian-build
+#RUN make debian-build
 
 CMD make
