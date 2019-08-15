@@ -18,4 +18,4 @@ comment out the "COPY" commands in the Dockerfile AND uncomment the VOLUME /buil
     # inside the container
     cd /release
     # manually install the prerequisites for the package
-    dpkg --install hall-lab-rfmix-2.03-r0_2.03r0-1debian9.5.deb
+    dpkg --install hall-lab-rfmix-2.03r0_2.03r0-1debian9.9.deb
