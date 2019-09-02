@@ -67,7 +67,7 @@ define eagle_wrapper
 BASE=$(DEB_BASE_INSTALL)
 export LD_LIBRARY_PATH=/opt/hall-lab/htslib-1.9/lib:$${LD_LIBRARY_PATH}
 
-exec $${BASE}/bin/$(EAGLE) "$$@"
+exec $${BASE}/bin/eagle-$(EAGLE_VERSION) "$$@"
 endef
 export eagle_wrapper
 
