@@ -18,13 +18,13 @@ BASE_INSTALL_DIR := $(WORK_DIR)
 RELEASE_DIR      := /release
 
 # source code information
-EAGLE_VERSION    := 2.03r0
-EAGLE_GIT_COMMIT := 9505bfa        # from: git rev-parse --short HEAD on 2019-08-15
-EAGLE_URL        := https://github.com/slowkoni/eagle
+EAGLE_VERSION    := 2.4.1
+EAGLE_URL        := https://github.com/indraniel/eagle
+EAGLE_GIT_COMMIT := 93cfc2f        # from: git rev-parse --short hall-lab (git branch)
+EAGLE_GIT_BRANCH := hall-lab
 EAGLE_BUILD_DIR  := $(WORK_DIR)/eagle
-EAGLE_CONFIGURE  := $(EAGLE_BUILD_DIR)/configure
-EAGLE_OUTPUT_DIR := $(WORK_DIR)/eagle-$(EAGLE_VERSION)
-EAGLE            := $(EAGLE_OUTPUT_DIR)/bin/eagle
+EAGLE_OUTPUT_DIR := $(WORK_DIR)/eagle/src
+EAGLE            := $(EAGLE_OUTPUT_DIR)/eagle-$(EAGLE_VERSION)
 
 # debian packaging related variables
 DEB_BUILD_DIR       := $(WORK_DIR)/deb-build
@@ -41,7 +41,7 @@ Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: libc6, libstdc++6, 
+Depends: libc6, libstdc++6, libopenblas-base, libgomp1, libcurl3, libboost-iostreams1.62.0, libboost-program-options1.62.0, libboost-random1.62.0, hall-lab-htslib-1.9
 Description: eagle-$(EAGLE_VERSION) for the Hall Lab
 Version: $(EAGLE_VERSION)-$(DEB_RELEASE_VERSION)
 endef
@@ -59,6 +59,17 @@ fi
 
 endef
 export debian_postrm
+
+# EAGLE EXECUTABLE DEBIAN WRAPPER ##############################################
+define eagle_wrapper
+#!/bin/bash
+
+BASE=$(DEB_BASE_INSTALL)
+export LD_LIBRARY_PATH=/opt/hall-lab/htslib-1.9/lib:$${LD_LIBRARY_PATH}
+
+exec $${BASE}/bin/$(EAGLE) "$$@"
+endef
+export eagle_wrapper
 
 all: debian
 
@@ -82,18 +93,22 @@ debian-build: | $(EAGLE)
 	$(ECHO) 2.0 > $(DEB_BUILD_DIR)/debian-binary
 	
 	# create the "installed" file directory structure
-	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
-
-	$(CP) -rv $(EAGLE_OUTPUT_DIR)/bin $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)
+	$(MKDIR) -p $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin
+	
+	# install the formal binary
+	$(CP) -rv $(EAGLE) $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin
+	
+	# wrapper script for eagle (setup library paths)
+	echo "$$eagle_wrapper" > $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/eagle
+	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/eagle
 
 $(EAGLE):
 	$(GIT) clone $(EAGLE_URL) \
 		&& cd $(EAGLE_BUILD_DIR) \
 		&& $(GIT) checkout -b $(EAGLE_VERSION) $(EAGLE_GIT_COMMIT) \
-		&& $(AUTORECONF) --force --install \
-		&& ./configure --prefix=$(EAGLE_OUTPUT_DIR) \
-		&& make \
-		&& make install
+		&& cd src \
+		&& make clean \
+		&& make
 
 debclean:
 	if [ -e $(DEB_BUILD_DIR) ]; then $(RM) -rf $(DEB_BUILD_DIR); fi
@@ -101,6 +116,5 @@ debclean:
 
 clean:
 	if [ -e $(EAGLE_BUILD_DIR) ]; then $(RM) -rf $(EAGLE_BUILD_DIR); fi
-	if [ -e $(EAGLE_OUTPUT_DIR) ]; then $(RM) -rf $(EAGLE_OUTPUT_DIR); fi
 	if [ -e $(DEB_BUILD_DIR) ]; then $(RM) -rf $(DEB_BUILD_DIR); fi
 	if [ -e $(DEB_PKG_PATH) ]; then $(RM) -rf $(DEB_PKG_PATH); fi
