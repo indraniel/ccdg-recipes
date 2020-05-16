@@ -1,15 +1,15 @@
-.PHONY: clean debian
+.PHONY: clean debian debian-build
 
 CNVNATOR_VERSION  := 0.3.3
 
-BASE_DIR          := /opt/ccdg/cnvnator-$(CNVNATOR_VERSION)
+BASE_DIR          := /opt/hall-lab/cnvnator-$(CNVNATOR_VERSION)
 BASE_INSTALL_DIR  := $(BASE_DIR)
 BASE_SRC_DIR      := $(BASE_DIR)/src
 
-ROOT_TGZ          := root_v6.06.02.source.tar.gz
+ROOT_TGZ          := root_v6.06.08.source.tar.gz
 ROOT_TGZ_PATH     := $(BASE_SRC_DIR)/$(ROOT_TGZ)
-ROOT_SRC_DIR      := $(BASE_SRC_DIR)/root-6.06.02
-ROOT_VERSION      := 6.06.02
+ROOT_SRC_DIR      := $(BASE_SRC_DIR)/root-6.06.08
+ROOT_VERSION      := 6.06.08
 
 YEPPP_TGZ         := yeppp-1.0.0.tar.bz2
 YEPPP_TGZ_PATH    := $(BASE_SRC_DIR)/$(YEPPP_TGZ)
@@ -35,11 +35,11 @@ CNVNATOR_EXE       := $(BASE_INSTALL_DIR)/bin/cnvnator-$(CNVNATOR_VERSION)
 SAMTOOLS_LIB       := $(CNVNATOR_SRC_DIR)/samtools/libbam.a
 
 DEB_BUILD_DIR       := $(BASE_DIR)/deb-build
-UBUNTU_EDITION      := $(shell . /etc/lsb-release; echo $$DISTRIB_RELEASE)
-DEB_RELEASE_VERSION := 2ubuntu$(UBUNTU_EDITION)
-DEB_PKG             := ccdg-cnvnator-$(CNVNATOR_VERSION)_$(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
+DEBIAN_EDITION      := $(shell cat /etc/debian_version)
+DEB_RELEASE_VERSION := 1debian$(DEBIAN_EDITION)
+DEB_PKG             := hall-lab-cnvnator-$(CNVNATOR_VERSION)_$(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION).deb
 DEB_PKG_PATH        := $(BASE_DIR)/$(DEB_PKG)
-DEB_BASE_INSTALL    := /opt/ccdg/cnvnator-$(CNVNATOR_VERSION)
+DEB_BASE_INSTALL    := /opt/hall-lab/cnvnator-$(CNVNATOR_VERSION)
 DEB_RELEASE_DIR     := /release
 
 all: build
@@ -106,14 +106,14 @@ $(ROOT_TGZ_PATH): | $(BASE_SRC_DIR)
 
 $(BASE_INSTALL_DIR):
 	if [ ! -e $(BASE_INSTALL_DIR) ]; then \
-		sudo mkdir -p $(BASE_INSTALL_DIR); \
-		sudo chown -R $(USER):$(USER) $(BASE_DIR); \
+		mkdir -p $(BASE_INSTALL_DIR); \
+		chown -R $(USER):$(USER) $(BASE_DIR); \
 	fi;
 
 $(BASE_SRC_DIR):
 	if [ ! -e $(BASE_SRC_DIR) ]; then \
-		sudo mkdir -p $(BASE_SRC_DIR); \
-		sudo chown -R $(USER):$(USER) $(BASE_DIR); \
+		mkdir -p $(BASE_SRC_DIR); \
+		chown -R $(USER):$(USER) $(BASE_DIR); \
 	fi;
 
 clean:
@@ -151,12 +151,12 @@ export root_wrapper
 
 # DEBIAN CONTROL FILE #########################################################
 define debian_control
-Package: ccdg-cnvnator-$(CNVNATOR_VERSION)
+Package: hall-lab-cnvnator-$(CNVNATOR_VERSION)
 Architecture: amd64
 Section: science
 Maintainer: Indraniel Das <idas@wustl.edu>
 Priority: optional
-Depends: libc6, libc6-dev, zlib1g, libgomp1, libstdc++6, libstdc++-4.8-dev, libgcc1, g++, libxpm4, ccdg-python-2.7.12
+Depends: libc6, libc6-dev, zlib1g, libgomp1, libstdc++6, libstdc++-6-dev, libgcc1, g++, libxpm4, hall-lab-python-2.7.15
 Description: An unofficial WUSTL MGI package of CNVnator ( $(CNVNATOR_VERSION) )
 Version: $(CNVNATOR_VERSION)-$(DEB_RELEASE_VERSION)
 endef
@@ -204,7 +204,9 @@ fi
 endef
 export debian_postrm
 
-debian:
+all: debian
+
+debian-build: build
 	# setup the directory
 	test -d $(DEB_BUILD_DIR) || mkdir $(DEB_BUILD_DIR)
 	
@@ -230,7 +232,8 @@ debian:
 	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/cnvnator
 	echo "$$root_wrapper" >$(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/root
 	chmod a+x $(DEB_BUILD_DIR)/$(DEB_BASE_INSTALL)/bin/root
-	
+
+debian: debian-build	
 	# create the underlying tars of the debian package
 	tar cvzf $(DEB_BUILD_DIR)/data.tar.gz --owner=0 --group=0 -C $(DEB_BUILD_DIR) opt usr
 	tar cvzf $(DEB_BUILD_DIR)/control.tar.gz -C $(DEB_BUILD_DIR) control preinst postrm
